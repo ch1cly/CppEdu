@@ -44,7 +44,7 @@ class queue{
     node<t> *top=nullptr;
     node<t> *end=nullptr;
     void destruct();
-    void copy(queue<t> other);
+    void copy(queue<t> &other);
 public:
     queue();
     void push(const t e);
@@ -55,28 +55,37 @@ public:
     t back();
     t &emplace(const t e);
     void swap(queue<t>& e);
-    queue<t>& operator=(queue<t> other);
+    queue<t>& operator=(queue<t> &other);
     ~queue();
 };
 template <class t>
-void queue<t>::destruct(){};
+void queue<t>::destruct(){
+    s = 0;
+    node<t> *temp;
+    while(top){
+        temp = top;
+        top = top->n;
+        delete temp;
+    }
+};
 
 template <class t>
-void queue<t>::copy(queue<t> o){
+void queue<t>::copy(queue<t>& o){
     s = o.s;
-    node<t> *temp = o.top;
+    node<t> *temp1,*temp = o.top;
     top = new node(o.top);
     end = top;
     while(temp->n){
         temp = temp->n;
-        end->n = temp;
-        end = new node(temp);
+        temp1 = new node<t>(temp);
+        end->n = temp1;
+        end = end->n;
     }
 };
 
 
 template <class t>
-queue<t>& queue<t>::operator=(queue<t> other){
+queue<t>& queue<t>::operator=(queue<t> &other){
     destruct();
     copy(other);
     return *this;
@@ -84,6 +93,7 @@ queue<t>& queue<t>::operator=(queue<t> other){
 
 template <class t>
 queue<t>::queue(){};
+
 template <class t>
 queue<t>::~queue(){
     destruct();
@@ -124,14 +134,14 @@ bool queue<t>::empty(){
 
 template <class t>
 t queue<t>::front(){
-    assert(!top);
+    //assert(!top);
     return top->e;
 }
                                 
 
 template <class t>
 t queue<t>::back(){
-    assert(!end);
+    //assert(!end);
     return end->e;
 }
 
