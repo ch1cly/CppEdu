@@ -5,8 +5,8 @@
 //  Created by Timur Bikbulatov on 09.10.2022.
 //
 
-#ifndef __1_hpp
-#define __1_hpp
+#ifndef _4_1_hpp
+#define _4_1_hpp
 
 #include <stdio.h>
 #include <cassert>

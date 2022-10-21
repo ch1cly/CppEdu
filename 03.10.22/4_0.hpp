@@ -1,6 +1,6 @@
 
-#ifndef __0_hpp
-#define __0_hpp
+#ifndef _4_0_hpp
+#define _4_0_hpp
 
 #include <stdio.h>
 #include <vector>
@@ -25,6 +25,8 @@ public:
             strm<<el << ' ';
         }
     }
+    template<class U>
+    friend std::ostream& operator<<(std::ostream& strm,Stack<U> const&s);
 };
 
 template <class t>
@@ -49,6 +51,14 @@ t  Stack<t>::new_pop(){
     v.pop_back();
     return e;
 };
+
+template<class U>
+std::ostream& operator<<(std::ostream& strm,Stack<U> const&s){
+    for(auto a: s.v)
+        strm<< a <<' ';
+    return strm;
+
+}
 
 /*
  
