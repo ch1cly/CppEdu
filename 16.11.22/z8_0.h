@@ -74,22 +74,26 @@ struct binom_action {
     };
 
 template<unsigned N, typename T>
-T binom(T a, T b){
+T binom1(T a, T b){
     return abstract_sum<N, N, T, binom_action>(std::pair<T, T>(a, b));
 }
 
 
 template<unsigned N, unsigned K, typename T>
-typename enable_if<(K>0), T>::type binom(T a, T b){
-    return binom<N, K-1>::value(a, b) +
+typename enable_if<(K>0), T>::type binom1(T a, T b){
+    return binom1<N, K-1>::value(a, b) +
     C<N, K>::value * pow<K>(a) * pow<N-K>(b) /
             monomial2d<K, N-K>::value;
 }
 
 template<unsigned N, unsigned K, typename T>
-typename enable_if<(K==0), T>::type binom(T a, T b){
+typename enable_if<(K==0), T>::type binom1(T a, T b){
     return pow<N>(b) / monomial2d<0,N>::value;
 }
 
+template<unsigned N, typename T>
+T binom(T a, T b) {
+    return binom1<N,N>(a, b);
+}
 
 #endif //CPPEDU_Z8_0_H
