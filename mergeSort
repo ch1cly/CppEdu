@@ -6,10 +6,10 @@
 #include <random>
 
 struct index {
-    size_t i = 0;
-    size_t j = 0;
+    size_t l = 0;
+    size_t r = 0;
     bool f = false;
-    index(size_t _i, size_t _j, bool _f) :i(_i), j(_j) , f(_f) {};
+    index(size_t _i, size_t _j, bool _f = false) :l(_i), r(_j), f(_f) {};
 };
 
 template <class t, class t1>
@@ -59,19 +59,19 @@ void mergeSort(std::vector<t>& vec) {
             leftInd = queueRec.back();
         }
 
-        size_t leftIndLeft = leftInd.i, rightIndLeft = rightInd.i;
+        size_t leftIndLeft = leftInd.l, rightIndLeft = rightInd.l;
         size_t ccounter = leftIndLeft;
 
-        while (leftIndLeft <= leftInd.j || rightIndLeft <= rightInd.j) {
-            if (leftIndLeft > leftInd.j) {
+        while (leftIndLeft <= leftInd.r || rightIndLeft <= rightInd.r) {
+            if (leftIndLeft > leftInd.r) {
                 vecTemp[ccounter] = vec[rightIndLeft];
                 ++rightIndLeft;
             }
-            else if (rightIndLeft > rightInd.j) {
+            else if (rightIndLeft > rightInd.r) {
                 vecTemp[ccounter] = vec[leftIndLeft];
                 leftIndLeft++;
             }
-            else if (lessEq(vec[leftIndLeft],vec[rightIndLeft])) {
+            else if (lessEq(vec[leftIndLeft], vec[rightIndLeft])) {
                 vecTemp[ccounter] = vec[leftIndLeft];
                 leftIndLeft++;
             }
@@ -82,13 +82,13 @@ void mergeSort(std::vector<t>& vec) {
             ++ccounter;
         }
 
-        for (size_t i = leftInd.i; i <= rightInd.j; i++)
+        for (size_t i = leftInd.l; i <= rightInd.r; i++)
             vec[i] = vecTemp[i];
 
         if (!leftInd.f ^ rightInd.f)
-            queueRec.push(index(leftInd.i, rightInd.j, leftInd.f ^ 1));
-         else
-            queueRec.back() = index(leftInd.i, rightInd.j, leftInd.f);
+            queueRec.push(index(leftInd.l, rightInd.r, leftInd.f ^ 1));
+        else
+            queueRec.back() = index(leftInd.l, rightInd.r, leftInd.f);
     }
 }
 
