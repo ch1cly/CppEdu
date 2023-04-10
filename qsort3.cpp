@@ -4,154 +4,182 @@
 #include <queue>
 #include <cmath>
 #include <random>
-#include <map>
 #include <algorithm>
 
-using namespace std;
+
+static constexpr double eps = 1e-10;
+
+template <typename T> inline
+T absM(const T& v) { return v < 0 ? -v : v; }
+
+
+template <class t>
+inline bool Eq(const t& f, const t& s) {
+    return absM(s - f) < eps;
+}
+
+template <class t>
+inline bool less(const t& f, const t& s) {
+    return f - s < eps;
+}
+
+template <class t>
+inline bool lessEq(const t& f, const t& s) {
+    return less(f, s) || Eq(f, s);
+}
+
+
+    
+
 
 
 struct index {
-    int l = 0;
-    int r = 0;
-    index(int _i, int _j) :l(_i), r(_j) {};
+    size_t l = 0;
+    size_t r = 0;
+    index(size_t _i, size_t _j) :l(_i), r(_j) {};
     index() {};
 };
 
-
-int urand(int l, int r) {
+size_t urand(size_t l, size_t r) {
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> distrib(l, r);
 
     return distrib(gen);
 }
-template <class t, class t1>
-t dint(t a, t1 b) {
-    return (a + b - 1) / b;
-}
 
 
-void partition3(vector<int>& v, int& pivotl, int&pivotr, int& l, int &r) {
-    swap(v[pivotl], v[l]);
-    swap(pivotl, l);
-    l = pivotl + 1;
-    pivotr = pivotl;
-    while (l < r) {
-        while (v[l] <= v[pivotl] && l < r) {
-            if (v[l] == v[pivotl]) {
-                pivotr++;
-                swap(v[l], v[pivotr]);
-                l++;
+template <class t>
+void partition3(std::vector<t>& vec, size_t& pivotL, size_t& pivotR, size_t& leftInd, size_t& rightInd) {
+    std::swap(vec[pivotL], vec[leftInd]);
+    std::swap(pivotL, leftInd);
+    leftInd = pivotL + 1;
+    pivotR = pivotL;
+
+    while (leftInd < rightInd) {
+        while (lessEq(vec[leftInd], vec[pivotL]) && leftInd < rightInd) {
+            if (vec[leftInd] == vec[pivotL]) {
+                pivotR++;
+                std::swap(vec[leftInd], vec[pivotR]);
+                leftInd++;
             }
             else
-                ++l;
+                ++leftInd;
         }
-        while (v[r] >= v[pivotr] && l < r) {
-            if (v[r] == v[pivotr]) {
-                pivotr++;
-                swap(v[r], v[pivotr]);
-                if (l == pivotr)
-                    l++;
+        while (lessEq(vec[pivotR], vec[rightInd]) && leftInd < rightInd) {
+            if (vec[rightInd] == vec[pivotR]) {
+                pivotR++;
+                std::swap(vec[rightInd], vec[pivotR]);
+                if (leftInd == pivotR)
+                    leftInd++;
             }
             else
-                --r;
+                --rightInd;
         }
-        if (v[l] > v[pivotl] && v[r] < v[pivotr])
-            swap(v[l], v[r]);
+        if (lessEq(vec[pivotL], vec[leftInd]) && less(vec[rightInd], vec[pivotR]))
+            std::swap(vec[leftInd], vec[rightInd]);
     }
 }
 
-void qinsert3(queue<index> &q,vector<int>& v, int& pivotl, int& pivotr, int& l, int& r) {
-    if (v[l] > v[pivotl]) {
-        l--;
+template <class t>
+void qinsert3(std::queue<index>& q, std::vector<t>& vec, size_t& pivotL, size_t& pivotR, size_t& leftInd, size_t& rightInd) {
+    if (less(vec[pivotL], vec[leftInd])) {
+        leftInd--;
     }
     else
-        r++;
+        rightInd++;
 
-    auto i = q.front();
+    auto globIndex = q.front();
     q.pop();
 
-    index s(0, 0), f(0, 0);
-    bool bs(0), bf(0);
+    index rightHalfInd(0, 0), leftHalfInd(0, 0);
+    bool isRightWideEnough(false), isLeftWideEnough(false);
 
-    if (pivotr < l) {
-        f.l = i.l ;
-        f.r = i.l + l - pivotr - 1;
-        bf = true;
+    if (pivotR < leftInd) {
+        leftHalfInd.l = globIndex.l;
+        leftHalfInd.r = globIndex.l + leftInd - pivotR - 1;
+        isLeftWideEnough = true;
     }
-    if (r < i.r) {
-        s.l = r;
-        s.r = i.r;
-        bs = true;
+    if (rightInd < globIndex.r) {
+        rightHalfInd.l = rightInd;
+        rightHalfInd.r = globIndex.r;
+        isRightWideEnough = true;
     }
 
-    for (int j = pivotl; j <= pivotr; ++j) {
-        swap(v[j], v[l]);
-        l--;
+    for (int i = pivotL; i <= pivotR; ++i) {
+        std::swap(vec[i], vec[leftInd]);
+        leftInd--;
     }
-    if (bf && !bs)
-        q.push(f);
-    else if (!bf && bs)
-        q.push(s);
-    else if (bf && bs) {
-        q.push(s);
-        q.push(f);
+    if (isLeftWideEnough && !isRightWideEnough)
+        q.push(leftHalfInd);
+    else if (!isLeftWideEnough && isRightWideEnough)
+        q.push(rightHalfInd);
+    else if (isLeftWideEnough && isRightWideEnough) {
+        q.push(rightHalfInd);
+        q.push(leftHalfInd);
     }
 
 }
 
-void qsort3(vector<int>& v) {
+template <class t> 
+void qsort3(std::vector<t>& v) {
     int pivot;
-    queue<index> q;
+    std::queue<index> q;
     if (v.size() < 2)
         return;
 
     q.push(index(0, v.size() - 1));
 
     while (q.size() > 0) {
-        auto i = q.front();        
-        int l = i.l, r = i.r;
-        if (r - l < 2) {
-            if (v[l] > v[r])
+        auto i = q.front();
+        size_t leftInd = i.l, rightInd = i.r;
+        if (rightInd - leftInd < 2) {
+            if (less(v[rightInd], v[leftInd]))
             {
-                swap(v[l], v[r]);
+                std::swap(v[leftInd], v[rightInd]);
             }
             q.pop();
             continue;
         }
-        int pivotl = urand(i.l, i.r);
+        size_t pivotL = urand(i.l, i.r);
         //int pivotl = 6;
-        int pivotr = pivotl;
-        partition3(v, pivotl, pivotr, l, r);
-        qinsert3(q,v, pivotl, pivotr, l, r);
+        size_t pivotR = pivotL;
+        partition3(v, pivotL, pivotR, leftInd, rightInd);
+        qinsert3(q, v, pivotL, pivotR, leftInd, rightInd);
 
     }
 }
-
-void ttest(vector<int>& v) {
-    for (int i = 1; i < v.size(); i++) {
-        if (v[i] < v[i - 1]) {
-            cout << "NO!" << endl;
+template <class t>
+void ttest(std::vector<t>& v) {
+    for (size_t i = 1; i < v.size(); i++) {
+        if (!lessEq(v[i - 1],v[i])) {
+            std::cout << "NO!" << std::endl;
+            std::cout << v[i - 1] << ' ' << v[i] << ' ' << lessEq(v[i - 1], v[i]) << ' ' << Eq(v[i - 1], v[i]) << std::endl;
             return;
         }
     }
-    cout << "!YES!YES!" << endl;
+    std::cout << "!YES!YES!" << std::endl;
 }
+
 
 void test() {
     int n = 0;
-    cin >> n;
-    
-    vector<int> v(n, 0);
-    for (int i = 0; i < n; i++)       v[i] = rand() % 100 + 1;
+    std::cin >> n;
+    std::vector<int> v(n, 0);
+    for (size_t i = 0; i < n; i++)       v[i] = rand() % 100 + 1;
     //vector<int> v = {2,2,0,0,1,1};
     //vector<int> v = {0,0,2,2,1,1};
-    
-
     qsort3(v);
     ttest(v);
-    cout << endl << "answer" << endl << endl;
+    std::cout << std::endl << "answer" << std::endl << std::endl;
 
     for (auto a : v)
-        cout << a << ' ';
+        std::cout << a << ' ';
+}
+
+int main(void) {
+
+    test();
+
+    return 0;
 }
