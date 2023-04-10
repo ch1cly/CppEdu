@@ -1,0 +1,137 @@
+#include <iostream>
+#include <ios>
+#include <vector>
+#include <queue>
+#include <cmath>
+#include <random>
+
+struct index {
+    size_t i = 0;
+    size_t j = 0;
+    bool f = false;
+    index(size_t _i, size_t _j, bool _f) :i(_i), j(_j) , f(_f) {};
+};
+
+template <class t, class t1>
+t dint(t a, t1 b) {
+    return (a + b - 1) / b;
+}
+
+constexpr double eps = 1e-10;
+
+template <typename T> inline
+T absM(const T& v) { return v < 0 ? -v : v; }
+
+
+template <class t>
+inline bool Eq(const t& f, const t& s) {
+    return absM(s - f) < eps;
+}
+
+template <class t>
+inline bool lessM(const t& f, const t& s) {
+    return f - s < eps;
+}
+
+template <class t>
+inline bool lessEq(const t& f, const t& s) {
+    return lessM(f, s) || Eq(f, s);
+}
+
+
+template <class t>
+void mergeSort(std::vector<t>& vec) {
+    auto vecTemp = vec;
+    std::queue<index> queueRec;
+    //stepping down? dodge it!
+    for (size_t i = 0; i < vec.size(); i++) {
+        queueRec.push(index(i, i, false));
+    }
+
+    while (queueRec.size() > 1) {
+        auto leftInd = queueRec.front(); queueRec.pop();
+        auto rightInd = leftInd;
+        if (!leftInd.f ^ queueRec.front().f) {
+            rightInd = queueRec.front(); queueRec.pop();
+        }
+        else {
+            rightInd = leftInd;
+            leftInd = queueRec.back();
+        }
+
+        size_t leftIndLeft = leftInd.i, rightIndLeft = rightInd.i;
+        size_t ccounter = leftIndLeft;
+
+        while (leftIndLeft <= leftInd.j || rightIndLeft <= rightInd.j) {
+            if (leftIndLeft > leftInd.j) {
+                vecTemp[ccounter] = vec[rightIndLeft];
+                ++rightIndLeft;
+            }
+            else if (rightIndLeft > rightInd.j) {
+                vecTemp[ccounter] = vec[leftIndLeft];
+                leftIndLeft++;
+            }
+            else if (lessEq(vec[leftIndLeft],vec[rightIndLeft])) {
+                vecTemp[ccounter] = vec[leftIndLeft];
+                leftIndLeft++;
+            }
+            else {
+                vecTemp[ccounter] = vec[rightIndLeft];
+                ++rightIndLeft;
+            }
+            ++ccounter;
+        }
+
+        for (size_t i = leftInd.i; i <= rightInd.j; i++)
+            vec[i] = vecTemp[i];
+
+        if (!leftInd.f ^ rightInd.f)
+            queueRec.push(index(leftInd.i, rightInd.j, leftInd.f ^ 1));
+         else
+            queueRec.back() = index(leftInd.i, rightInd.j, leftInd.f);
+    }
+}
+
+
+template <class t>
+void ttest(std::vector<t>& v) {
+    for (size_t i = 1; i < v.size(); i++) {
+        if (!lessEq(v[i - 1], v[i])) {
+            std::cout << "NO!" << std::endl;
+            std::cout << v[i - 1] << ' ' << v[i] << ' ' << lessEq(v[i - 1], v[i]) << ' ' << Eq(v[i - 1], v[i]) << std::endl;
+            return;
+        }
+    }
+    std::cout << "!YES!YES!" << std::endl;
+}
+
+void test() {
+    size_t n = 0;
+    std::cin >> n;
+    std::vector<double> v(n, 0);
+    double lower_bound = 0;
+    double upper_bound = 1000;
+    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
+    std::default_random_engine re;
+    double a_random_double = unif(re);
+
+    for (size_t i = 0; i < n; i++)
+        v[i] = unif(re);
+
+    //HERE IT IS
+    mergeSort(v);
+    ttest(v);
+    std::cout << std::endl << "answer" << std::endl << std::endl;
+
+    for (auto a : v)
+        std::cout << a << ' ';
+}
+
+
+int main(void) {
+
+
+    test();
+
+    return 0;
+}
