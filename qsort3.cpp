@@ -29,10 +29,6 @@ inline bool lessEq(const t& f, const t& s) {
 }
 
 
-    
-
-
-
 struct index {
     size_t l = 0;
     size_t r = 0;
@@ -47,7 +43,6 @@ size_t urand(size_t l, size_t r) {
 
     return distrib(gen);
 }
-
 
 template <class t>
 void partition3(std::vector<t>& vec, size_t& pivotL, size_t& pivotR, size_t& leftInd, size_t& rightInd) {
@@ -118,7 +113,6 @@ void qinsert3(std::queue<index>& q, std::vector<t>& vec, size_t& pivotL, size_t&
         q.push(rightHalfInd);
         q.push(leftHalfInd);
     }
-
 }
 
 template <class t> 
@@ -142,13 +136,12 @@ void qsort3(std::vector<t>& v) {
             continue;
         }
         size_t pivotL = urand(i.l, i.r);
-        //int pivotl = 6;
         size_t pivotR = pivotL;
         partition3(v, pivotL, pivotR, leftInd, rightInd);
         qinsert3(q, v, pivotL, pivotR, leftInd, rightInd);
-
     }
 }
+
 template <class t>
 void ttest(std::vector<t>& v) {
     for (size_t i = 1; i < v.size(); i++) {
@@ -161,14 +154,20 @@ void ttest(std::vector<t>& v) {
     std::cout << "!YES!YES!" << std::endl;
 }
 
-
 void test() {
     int n = 0;
     std::cin >> n;
-    std::vector<int> v(n, 0);
-    for (size_t i = 0; i < n; i++)       v[i] = rand() % 100 + 1;
-    //vector<int> v = {2,2,0,0,1,1};
-    //vector<int> v = {0,0,2,2,1,1};
+    std::vector<double> v(n, 0);
+    double lower_bound = 0;
+    double upper_bound = 1000;
+    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
+    std::default_random_engine re;
+    double a_random_double = unif(re);
+
+    for (size_t i = 0; i < n; i++)       
+        v[i] = unif(re);
+
+    //HERE IT IS
     qsort3(v);
     ttest(v);
     std::cout << std::endl << "answer" << std::endl << std::endl;
