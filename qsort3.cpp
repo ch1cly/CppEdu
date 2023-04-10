@@ -19,13 +19,13 @@ inline bool Eq(const t& f, const t& s) {
 }
 
 template <class t>
-inline bool less(const t& f, const t& s) {
+inline bool lessM(const t& f, const t& s) {
     return f - s < eps;
 }
 
 template <class t>
 inline bool lessEq(const t& f, const t& s) {
-    return less(f, s) || Eq(f, s);
+    return lessM(f, s) || Eq(f, s);
 }
 
 
@@ -71,14 +71,14 @@ void partition3(std::vector<t>& vec, size_t& pivotL, size_t& pivotR, size_t& lef
             else
                 --rightInd;
         }
-        if (lessEq(vec[pivotL], vec[leftInd]) && less(vec[rightInd], vec[pivotR]))
+        if (lessEq(vec[pivotL], vec[leftInd]) && lessM(vec[rightInd], vec[pivotR]))
             std::swap(vec[leftInd], vec[rightInd]);
     }
 }
 
 template <class t>
 void qinsert3(std::queue<index>& q, std::vector<t>& vec, size_t& pivotL, size_t& pivotR, size_t& leftInd, size_t& rightInd) {
-    if (less(vec[pivotL], vec[leftInd])) {
+    if (lessM(vec[pivotL], vec[leftInd])) {
         leftInd--;
     }
     else
@@ -128,7 +128,7 @@ void qsort3(std::vector<t>& v) {
         auto i = q.front();
         size_t leftInd = i.l, rightInd = i.r;
         if (rightInd - leftInd < 2) {
-            if (less(v[rightInd], v[leftInd]))
+            if (lessM(v[rightInd], v[leftInd]))
             {
                 std::swap(v[leftInd], v[rightInd]);
             }
